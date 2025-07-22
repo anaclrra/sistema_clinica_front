@@ -48,7 +48,7 @@ function Layout(params: LayoutProps): JSX.Element {
             itemId: "1",
             label: "Paciente",
             hideTitle: true,
-            link: "/patients",
+            link: "/",
             //icon: <Person />,
         }, {
             itemId: "2",
@@ -67,7 +67,6 @@ function Layout(params: LayoutProps): JSX.Element {
     return (
         <Box display={"flex"}>
             <CssBaseline />
-
             <Box sx={styles.containerLayout}>
                 <TopBar colorMode={colorMode} setColorMode={setColorMode} />
                 <Box sx={styles.containerBody}>

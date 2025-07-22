@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { myTheme } from './theme';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './pages/layout';
+import Patients from './pages/patients';
+import Doctors from './pages/doctors';
 
 function App() {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -25,7 +27,13 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout colorMode={colorMode}
-              setColorMode={setColorMode} />} /></Routes></BrowserRouter>
+              setColorMode={setColorMode} />} >
+              <Route path='/' element={<Patients />}></Route>
+              <Route path='/doctors' element={<Doctors />}></Route>
+
+            </Route>
+
+          </Routes></BrowserRouter>
       </div>
     </ThemeProvider>
   )
