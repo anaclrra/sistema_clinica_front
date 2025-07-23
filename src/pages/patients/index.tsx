@@ -10,6 +10,7 @@ import api from "../../services/api";
 import { ptBR } from "@mui/x-data-grid/locales";
 import ModalCreatePatient from "./modalCreatePatient";
 import ModalEditPatient from "./modalEditPatient";
+import { useNavigate } from "react-router-dom";
 
 function Patients(): JSX.Element {
     const [rows, setRows] = useState<Patient[]>([]);
@@ -19,7 +20,8 @@ function Patients(): JSX.Element {
     const [selectedRow, setSelectedRow] = useState<Patient | null>(null)
     const theme = useTheme();
     const styles = useStyles(theme);
-    console.log(loadingPage);
+    const navigate = useNavigate();
+    console.log(loadingPage)
 
     //     const handleSearchInputChange = (event) => {
     //     setSearchText(event.target.value);
@@ -149,7 +151,7 @@ function Patients(): JSX.Element {
                 return (
                     <Stack sx={styles.stackBtns}>
                         <IconButton onClick={() => handleEditOpen(params.row)}><Edit fontSize="small" /></IconButton>
-                        <IconButton><History fontSize="small" /></IconButton>
+                        <IconButton onClick={() => navigate(`/appointments/patient/${params.row.id}`)} ><History fontSize="small" /></IconButton>
 
                     </Stack>
                 );

@@ -2,10 +2,12 @@
 import { CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { myTheme } from './theme';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './pages/layout';
 import Patients from './pages/patients';
 import Doctors from './pages/doctors';
+import PatientHistory from './pages/patients/Appointmentshistory';
+import DoctorHistory from './pages/doctors/AppointmentsHistory';
 
 function App() {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -26,10 +28,17 @@ function App() {
       <div className="App">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Layout colorMode={colorMode}
-              setColorMode={setColorMode} />} >
-              <Route path='/' element={<Patients />}></Route>
-              <Route path='/doctors' element={<Doctors />}></Route>
+            <Route
+              path="/"
+              element={
+                <Layout colorMode={colorMode} setColorMode={setColorMode} />
+              }
+            >
+              <Route index element={<Navigate to="/patients" replace />} />
+              <Route path="patients" element={<Patients />} />
+              <Route path='doctors' element={<Doctors />} />
+              <Route path='appointments/patient/:id' element={<PatientHistory />} />
+              <Route path='appointments/doctor/:id' element={<DoctorHistory />} />
 
             </Route>
 

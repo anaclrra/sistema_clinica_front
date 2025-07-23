@@ -48,7 +48,7 @@ function Layout(params: LayoutProps): JSX.Element {
             itemId: "1",
             label: "Paciente",
             hideTitle: true,
-            link: "/",
+            link: "/patients",
             //icon: <Person />,
         }, {
             itemId: "2",
