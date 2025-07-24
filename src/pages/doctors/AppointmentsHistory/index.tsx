@@ -92,9 +92,9 @@ const DoctorHistory: React.FC = () => {
                         }}
                         onClick={() => navigate('/doctors')}
                     >
-                        Medicos
+                        Médicos
                     </Box>
-                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Historico medico</Typography>
+                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Historico médico</Typography>
                 </Breadcrumbs>
 
             </Stack>

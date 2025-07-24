@@ -1,5 +1,5 @@
 import { Add, Edit, History, Search } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme } from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme, type AlertProps } from "@mui/material";
 import { useEffect, useState, type JSX } from "react";
 import useStyles from "./styles";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
@@ -11,6 +11,7 @@ import { ptBR } from "@mui/x-data-grid/locales";
 import ModalCreateDoctor from "./modalCreateDoctor";
 import ModalEditDoctor from "./modalEditDoctor";
 import { useNavigate } from "react-router-dom";
+import SnackBar from "../../components/snackBar";
 
 
 function Doctors(): JSX.Element {
@@ -19,6 +20,8 @@ function Doctors(): JSX.Element {
     const [openCreateDoctorModal, setOpenCreateDoctorModal] = useState<boolean>(false);
     const [openEditDoctorModal, setOpenEditDoctorModal] = useState<boolean>(false)
     const [selectedRow, setSelectedRow] = useState<Doctor | null>(null)
+    const [snackbar, setSnackbar] = useState<AlertProps | null>(null);
+
     const theme = useTheme();
     const styles = useStyles(theme);
     const navigate = useNavigate()
@@ -89,13 +92,17 @@ function Doctors(): JSX.Element {
             try {
                 setLoadingPage(true);
                 const response = await api.get("/doctors");
-
                 setRows(response.data);
+                setSnackbar({
+                    children: "Sucesso ao buscar médicos",
+                    severity: "success"
+                });
             } catch (error) {
                 console.error(error);
-                // if (error?.response?.data?.error)
-                //     notify(error.response.data.error, "error");
-                // else notify("Não foi possível se conectar ao servidor!", "error");
+                setSnackbar({
+                    children: "Erro ao buscar médicos",
+                    severity: "error"
+                });
             } finally {
                 setLoadingPage(false);
             }
@@ -163,7 +170,7 @@ function Doctors(): JSX.Element {
                         <Box sx={styles.boxSearchAndFilter}>
                             <TextField
                                 size="small"
-                                label="Pesquisar Medico"
+                                label="Pesquisar Médico"
                                 variant="filled"
                                 sx={styles.searchInput}
                                 // value={searchText}
@@ -181,7 +188,7 @@ function Doctors(): JSX.Element {
                             />
 
 
-                            <Tooltip title="Adicionar medico">
+                            <Tooltip title="Adicionar médico">
                                 <Button
                                     onClick={handleNewOpen}
                                     sx={styles.buttonMobile}
@@ -216,10 +223,13 @@ function Doctors(): JSX.Element {
                 setOpenCreateDoctorModal={setOpenCreateDoctorModal}
                 rows={rows}
                 setRows={setRows}
+                setSnackbar={setSnackbar}
 
             />
             <ModalEditDoctor openEditDoctorModal={openEditDoctorModal} setOpenEditDoctorModal={setOpenEditDoctorModal} selectedRow={selectedRow} rows={rows}
-                setRows={setRows} />
+                setRows={setRows} setSnackbar={setSnackbar} />
+            <SnackBar snackbar={snackbar} setSnackbar={setSnackbar} />
+
         </>
     )
 }

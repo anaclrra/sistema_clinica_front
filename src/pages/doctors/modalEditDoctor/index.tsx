@@ -13,6 +13,7 @@ import {
     Paper,
     TextField,
     Typography,
+    type AlertProps,
 } from "@mui/material";
 
 import { HowToReg } from "@mui/icons-material";
@@ -30,6 +31,8 @@ interface ModalCreateProps {
     rows: Doctor[] | [];
     setRows: React.Dispatch<SetStateAction<Doctor[]>>;
     selectedRow: Doctor | null
+    setSnackbar: (value: AlertProps | null) => void;
+
 }
 
 
@@ -40,6 +43,7 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
         rows,
         setRows,
         selectedRow
+        , setSnackbar
     } = params;
 
     const [id, setId] = useState<string>("")
@@ -139,9 +143,10 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
                 setSpecialties(response.data);
             } catch (error) {
                 console.error(error);
-                // if (error?.response?.data?.error)
-                //   notify(error.response.data.error, "error");
-                // else notify("Não foi possível se conectar ao servidor!", "error");
+                setSnackbar({
+                    children: "Erro ao buscar especialidades",
+                    severity: "error"
+                });
             } finally {
                 setLoading(false);
             }
@@ -169,13 +174,17 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
                     )
                 );
                 handleClose();
-                //notify(null, "Dados salvos com sucesso!", "success");
+                setSnackbar({
+                    children: "Médico editado com sucesso!",
+                    severity: "success"
+                });
             }
         } catch (error: unknown) {
             console.log(error);
-            // if (error instanceof AxiosError && error?.response?.data && error.status)
-            //     notify(error?.status || 500, undefined, "error", error);
-            // else notify(null, "Erro ao criar novo usuário!", "error");
+            setSnackbar({
+                children: "Erro ao editar médico",
+                severity: "error"
+            });
         } finally {
             setLoading(false);
         }

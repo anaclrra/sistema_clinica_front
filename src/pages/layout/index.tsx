@@ -1,8 +1,9 @@
 import { Box, CssBaseline } from "@mui/material";
-import { type JSX } from "react";
+import { useState, type JSX } from "react";
 import SideBar from "../../components/sideBar";
 import { Outlet } from "react-router-dom";
 import TopBar from "../../components/topBar";
+import { Person } from "@mui/icons-material";
 
 export interface LayoutProps {
     colorMode: boolean;
@@ -11,27 +12,30 @@ export interface LayoutProps {
 
 function Layout(params: LayoutProps): JSX.Element {
     const { colorMode, setColorMode } = params;
+    const [openDrawer, setOpenDrawer] = useState<boolean>(true);
 
     const styles = {
         containerLayout: {
             display: "flex",
-            width: "100%",
-            height: "fit-content",
-            flexDirection: "column",
+            width: "100vw",
+            height: "100vh",
+            overflowY: "auto",
+            overflowX: "hidden",
         },
         containerBody: {
             display: "flex",
+            flexDirection: "column",
             width: "100%",
-            height: "100%",
+            height: "fit-content",
             minWidth: "350px",
         },
         containerOutlet: {
             flexGrow: 1,
             padding: 3,
-            // paddingTop: 5,
+            height: "fit-content",
             width: "100%",
             gap: 2,
-            minWidth: "calc(100vw - 300px)",
+            minWidth: "calc(100vw - 31a0px)",
         },
         titleAndLinkPage: {
             flexGrow: 1,
@@ -49,31 +53,30 @@ function Layout(params: LayoutProps): JSX.Element {
             label: "Paciente",
             hideTitle: true,
             link: "/patients",
-            //icon: <Person />,
+            icon: <Person />,
         }, {
             itemId: "2",
-            label: "Medico",
+            label: "Médico",
             hideTitle: true,
             link: "/doctors",
-            //icon: <Person />,
+            icon: <Person />,
         }, {
             itemId: "3",
             label: "Consulta",
             hideTitle: true,
             link: "/appointment",
-            //icon: <Person />,
+            icon: <Person />,
         },]
 
     return (
         <Box display={"flex"}>
             <CssBaseline />
             <Box sx={styles.containerLayout}>
-                <TopBar colorMode={colorMode} setColorMode={setColorMode} />
+                <SideBar
+                    items={sideBarPages} setOpenDrawer={setOpenDrawer} openDrawer={openDrawer} />
                 <Box sx={styles.containerBody}>
-                    <SideBar
-                        items={sideBarPages} />
+                    <TopBar colorMode={colorMode} setColorMode={setColorMode} setOpenDrawer={setOpenDrawer} openDrawer={openDrawer} />
                     <Box component="main" sx={styles.containerOutlet}>
-
                         <Outlet />
                     </Box>
                 </Box>

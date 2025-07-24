@@ -73,24 +73,64 @@ const useStyles = (theme: Theme) => ({
   },
   boxDataGrid: { display: { xs: "none", sm: "flex" }, width: "100%" },
   dataGrid: {
-    borderLeft: "none",
-    borderRight: "none",
-    borderBottom: "none",
     width: "100%",
-    height: "calc(100vh - 400px)",
+    height: "100%",
+    fontSize: 12,
+    borderRadius: 0,
     border: 0,
     backgroundColor: "transparent",
-
-    "& .MuiDataGrid-columnHeader": {
-      backgroundColor: theme.palette.background.paper, // Altera cor do cabeçalho
-      borderTop: `1px solid ${theme.palette.background.textField}`,
+    "&.MuiDataGrid-root .MuiDataGrid-cell:focus-within": {
+      outline: "none !important",
     },
-    "&. .MuiDataGrid-cell": {
-      borderTop: `1px solid ${theme.palette.background.textField}`,
+    ".MuiDataGrid-cell": {
+      display: "flex",
+      alignItems: "center",
       borderColor: theme.palette.background.textField,
     },
-    "& .even-row": { backgroundColor: "table" },
-    "& .odd-row": { backgroundColor: "background.paper" },
+    "& .MuiDataGrid-scrollbar--vertical": {
+      display: "none",
+    },
+    "& .MuiDataGrid-filler": {
+      display: "none",
+    },
+    "& .MuiDataGrid-scrollbarFiller--borderTop": {
+      display: "none",
+    },
+    "& .MuiDataGrid-scrollbarFiller--header": {
+      // display: "none",
+      backgroundColor: theme.palette.background.paper,
+      borderTop: `1px solid ${theme.palette.background.textField}`,
+    },
+    "& .MuiDataGrid-columnHeaderTitle": {
+      color: "text.secondary", // Altera a cor do titulo do cabeçalho
+    },
+    "& .MuiDataGrid-footerContainer": {
+      backgroundColor: "transparent", // Altera cor do rodapé
+      border: 0,
+      borderTop: `1px solid ${theme.palette.background.textField}`,
+      height: "45px",
+    },
+    "& .MuiDataGrid-columnHeader": {
+      backgroundColor: theme.palette.background.paper, // Altera cor do cabeçalho
+      border: 0,
+      borderTop: `1px solid ${theme.palette.background.textField}`,
+      width: "100%",
+    },
+    "& .MuiDataGrid-topContainer": {
+      border: 0,
+      backgroundColor: theme.palette.background.paper,
+    },
+    "& .MuiDataGrid-row--borderBottom": {
+      border: 0,
+    },
+    "& .MuiDataGrid-columnHeaders": {
+      border: 0,
+      height: "45px",
+      backgroundColor: theme.palette.background.paper,
+    },
+
+    "& .even-row": { backgroundColor: theme.palette.background.card },
+    "& .odd-row": { backgroundColor: theme.palette.background.paper },
   },
   boxHeader: {
     width: "100%",

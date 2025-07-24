@@ -1,4 +1,4 @@
-import { createTheme, type Theme } from "@mui/material";
+import { alpha, createTheme, lighten, type Theme } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface TypeBackground {
@@ -11,12 +11,12 @@ declare module "@mui/material/styles" {
 }
 const colors = {
   primary: {
-    light: "#13C06A",
-    dark: "#1AD866",
+    light: "#00B1D9",
+    dark: "#00B1D9",
   },
   secondary: {
-    light: "#039FDD",
-    dark: "#039FDD",
+    light: "#FF8732",
+    dark: "#FF8732",
   },
 };
 
@@ -67,6 +67,62 @@ const mainTheme = (colorMode: boolean): Theme =>
         md: 900,
         lg: 1200,
         xl: 1536,
+      },
+    },
+    components: {
+      MuiButton: {
+        variants: [
+          {
+            props: { variant: "contained" },
+            style: {
+              backgroundColor: !colorMode
+                ? alpha(colors.primary.light, 0.1)
+                : alpha(colors.primary.dark, 0.1),
+              color: !colorMode ? colors.primary.light : colors.primary.dark,
+            },
+          },
+        ],
+        styleOverrides: {
+          root: {
+            textTransform: "capitalize",
+            boxShadow: "none",
+            borderRadius: "5px",
+            "&:hover": {
+              boxShadow: "none",
+            },
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            width: "100%",
+
+            "& .MuiFilledInput-root": {
+              backgroundColor: theme.palette.background.textField,
+              borderRadius: "10px",
+              fontSize: "0.875rem",
+              "&:hover": {
+                backgroundColor: lighten(
+                  theme.palette.background.textField,
+                  0.1
+                ),
+              },
+
+              "& input:-webkit-autofill": {
+                boxShadow: `0 0 0 1000px transparent inset`,
+                transition: "background-color 5000s ease-in-out 0s",
+                border: "none",
+                lineHeight: "1.5",
+                fontSize: "0.875rem",
+              },
+              //remove a linha
+              "&:before, &:hover:before, &:after": {
+                borderBottom: "none !important",
+              },
+            },
+          }),
+        },
       },
     },
   });

@@ -12,6 +12,7 @@ import {
     Paper,
     TextField,
     Typography,
+    type AlertProps,
 } from "@mui/material";
 
 import { HowToReg } from "@mui/icons-material";
@@ -32,6 +33,8 @@ interface ModalCreateProps {
     setOpenCreatePatientModal: (value: boolean) => void;
     rows: Patient[] | [];
     setRows: React.Dispatch<SetStateAction<Patient[]>>;
+    setSnackbar: (value: AlertProps | null) => void;
+
 }
 
 
@@ -41,6 +44,7 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
         setOpenCreatePatientModal,
         rows,
         setRows,
+        setSnackbar
     } = params;
 
     const [name, setName] = useState<string>("");
@@ -144,13 +148,17 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
             if (response.data) {
                 setRows([...(rows || []), response.data]);
                 handleClose();
-                //notify(null, "Dados salvos com sucesso!", "success");
+                setSnackbar({
+                    children: "Paciente criado com sucesso!",
+                    severity: "success"
+                });
             }
         } catch (error: unknown) {
             console.log(error);
-            // if (error instanceof AxiosError && error?.response?.data && error.status)
-            //     notify(error?.status || 500, undefined, "error", error);
-            // else notify(null, "Erro ao criar novo usuário!", "error");
+            setSnackbar({
+                children: "Error: Não foi possível adicionar paciente",
+                severity: "error"
+            });
         } finally {
             setLoading(false);
         }
@@ -263,15 +271,27 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
                                     adapterLocale={"pt-br"}
                                 >
                                     <DatePicker
+                                        label="Data de nascimento"
+                                        sx={styles.textfield}
+                                        disabled={loading}
                                         disableFuture
                                         value={dateOfBirth}
                                         maxDate={dayjs()}
                                         onChange={(newValue) => {
                                             setDateOfBirth(newValue);
                                         }}
-                                    //sx={styles.textField}
-
+                                        slotProps={{
+                                            textField: {
+                                                variant: "filled",
+                                                error: isSubmit && !dateOfBirth,
+                                                helperText:
+                                                    isSubmit && !dateOfBirth
+                                                        ? "Campo obrigatório"
+                                                        : "",
+                                            },
+                                        }}
                                     />
+
                                 </LocalizationProvider>
                             </Box>
                         </Grid>

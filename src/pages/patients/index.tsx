@@ -1,9 +1,9 @@
 import { Add, Edit, History, Search } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme } from "@mui/material";
-import { useEffect, useState, type JSX } from "react";
+import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme, type AlertProps } from "@mui/material";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import useStyles from "./styles";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
-import { maskCPF, maskPhone } from "../../utils/maskFields";
+import { maskCPF, maskPhone, removeMask } from "../../utils/maskFields";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 import api from "../../services/api";
@@ -11,6 +11,7 @@ import { ptBR } from "@mui/x-data-grid/locales";
 import ModalCreatePatient from "./modalCreatePatient";
 import ModalEditPatient from "./modalEditPatient";
 import { useNavigate } from "react-router-dom";
+import SnackBar from "../../components/snackBar";
 
 function Patients(): JSX.Element {
     const [rows, setRows] = useState<Patient[]>([]);
@@ -18,83 +19,45 @@ function Patients(): JSX.Element {
     const [openCreatePatientModal, setOpenCreatePatientModal] = useState<boolean>(false);
     const [openEditPatientModal, setOpenEditPatientModal] = useState<boolean>(false)
     const [selectedRow, setSelectedRow] = useState<Patient | null>(null)
+    const [snackbar, setSnackbar] = useState<AlertProps | null>(null);
+    const [searchText, setSearchText] = useState<string | null>(null)
+
     const theme = useTheme();
     const styles = useStyles(theme);
     const navigate = useNavigate();
     console.log(loadingPage)
 
-    //     const handleSearchInputChange = (event) => {
-    //     setSearchText(event.target.value);
-    //   };
+    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
 
-    //   const getFilteredRows = useMemo(() => {
-    //     const rowsFiltered = Array.isArray(rows)
-    //       ? rows?.filter(
-    //           (row) =>
-    //             (tabValue === 0 && row.status === true) ||
-    //             (tabValue === 1 && row.status === false)
-    //         )
-    //       : [];
+    const getFilteredRows = useMemo(() => {
+        return rows?.filter((row: Patient) => {
+            if (!searchText) return true;
 
-    //     return rowsFiltered?.filter((row) => {
-    //       return (
-    //         (searchText
-    //           ? row?.PerfilCliente?.nomeFantasia
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.PerfilCliente?.nome
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.PerfilCliente?.sobrenome
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.login?.toLowerCase().includes(searchText.toLowerCase()) ||
-    //             row?.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-    //             (removeMask(row?.PerfilCliente?.cpf).includes(
-    //               removeMask(searchText)
-    //             ) &&
-    //               !!removeMask(searchText)) ||
-    //             (removeMask(row?.PerfilCliente?.cnpj).includes(
-    //               removeMask(searchText)
-    //             ) &&
-    //               !!removeMask(searchText))
-    //           : true) &&
-    //         row.verificado?.toString().includes(verifyStatus?.value?.toString()) &&
-    //         row.codigoPermissao?.includes(permissionStatus?.value) &&
-    //         (criadoEm
-    //           ? new Date(row?.createAt)
-    //               .toLocaleDateString()
-    //               .includes(new Date(criadoEm).toLocaleDateString())
-    //           : true) &&
-    //         (row?.PerfilCliente
-    //           ? row?.PerfilCliente?.pessoaFisica
-    //               ?.toString()
-    //               .includes(personTypeStatus?.value?.toString())
-    //           : true)
-    //       );
-    //     });
-    //   }, [
-    //     verifyStatus,
-    //     permissionStatus,
-    //     personTypeStatus,
-    //     criadoEm,
-    //     tabValue,
-    //     rows,
-    //     searchText,
-    //   ]);
+            return (
+                row?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+                removeMask(row?.cpf).includes(removeMask(searchText))
+            );
+        }) ?? [];
+    }, [rows, searchText]);
 
     useEffect(() => {
         async function fetchPatients() {
             try {
                 setLoadingPage(true);
                 const response = await api.get("/patients");
-
                 setRows(response.data);
+                setSnackbar({
+                    children: "Sucesso ao buscar pacientes",
+                    severity: "success"
+                });
             } catch (error) {
                 console.error(error);
-                // if (error?.response?.data?.error)
-                //     notify(error.response.data.error, "error");
-                // else notify("Não foi possível se conectar ao servidor!", "error");
+                setSnackbar({
+                    children: "Error: Não foi possível buscar pacientes",
+                    severity: "error"
+                });
             } finally {
                 setLoadingPage(false);
             }
@@ -165,6 +128,13 @@ function Patients(): JSX.Element {
         setSelectedRow(row);
         setOpenEditPatientModal(true)
     }
+    // function CustomNoRowsOverlay() {
+    //     return (
+    //         <Box sx={styles.boxNoRowsOverlay}>
+    //             <Typography color="textDisabled">{`Não possui pacientes `}</Typography>
+    //         </Box>
+    //     );
+    // }
     return (
         <>
             <Box sx={styles.containerBox}>
@@ -176,8 +146,8 @@ function Patients(): JSX.Element {
                                 label="Pesquisar Paciente"
                                 variant="filled"
                                 sx={styles.searchInput}
-                                // value={searchText}
-                                // onChange={handleSearchInputChange}
+                                value={searchText}
+                                onChange={handleSearchInputChange}
                                 autoComplete="off"
                                 slotProps={{
                                     input: {
@@ -204,16 +174,19 @@ function Patients(): JSX.Element {
                     </Box>
 
                     <Box width="100%">
-                        <DataGrid rows={rows} columns={columns} density="standard"
+                        <DataGrid rows={getFilteredRows} columns={columns}
+                            density="standard"
                             disableColumnMenu
                             disableColumnFilter
                             hideFooterSelectedRowCount
                             localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
                             sx={styles.dataGrid}
                             getRowClassName={(params) =>
-                                params.indexRelativeToCurrentPage % 2 === 0 ? "even-row" : "odd-row"
+                                params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row'
                             }
+                            // pageSizeOptions={[5, 10, 20]}
                             initialState={{
+                                //  ...rows.initialState,
                                 pagination: {
                                     paginationModel: { pageSize: 5 },
                                 },
@@ -226,10 +199,11 @@ function Patients(): JSX.Element {
                 setOpenCreatePatientModal={setOpenCreatePatientModal}
                 rows={rows}
                 setRows={setRows}
-
+                setSnackbar={setSnackbar}
             />
             <ModalEditPatient openEditPatientModal={openEditPatientModal} setOpenEditPatientModal={setOpenEditPatientModal} selectedRow={selectedRow} rows={rows}
-                setRows={setRows} />
+                setRows={setRows} setSnackbar={setSnackbar} />
+            <SnackBar snackbar={snackbar} setSnackbar={setSnackbar} />
         </>
     )
 }

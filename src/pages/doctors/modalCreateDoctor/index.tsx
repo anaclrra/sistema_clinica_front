@@ -13,6 +13,7 @@ import {
     Paper,
     TextField,
     Typography,
+    type AlertProps,
 } from "@mui/material";
 
 import { HowToReg } from "@mui/icons-material";
@@ -29,6 +30,8 @@ interface ModalCreateProps {
     setOpenCreateDoctorModal: (value: boolean) => void;
     rows: Doctor[] | [];
     setRows: React.Dispatch<SetStateAction<Doctor[]>>;
+    setSnackbar: (value: AlertProps | null) => void;
+
 }
 
 
@@ -38,6 +41,7 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
         setOpenCreateDoctorModal,
         rows,
         setRows,
+        setSnackbar
     } = params;
 
     const [name, setName] = useState<string>("");
@@ -153,13 +157,17 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
 
                 setRows([...(rows || []), response.data]);
                 handleClose();
-                //notify(null, "Dados salvos com sucesso!", "success");
+                setSnackbar({
+                    children: "Médico criado com sucesso!",
+                    severity: "success"
+                });
             }
         } catch (error: unknown) {
             console.log(error);
-            // if (error instanceof AxiosError && error?.response?.data && error.status)
-            //     notify(error?.status || 500, undefined, "error", error);
-            // else notify(null, "Erro ao criar novo usuário!", "error");
+            setSnackbar({
+                children: "Erro ao criar médico",
+                severity: "error"
+            });
         } finally {
             setLoading(false);
         }
@@ -197,7 +205,7 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
                             <IconButton size="small">
                                 <HowToReg sx={{ color: "primary.main" }} />
                             </IconButton>
-                            <Typography fontWeight={500}>Cadastrar medico</Typography>
+                            <Typography fontWeight={500}>Cadastrar médico</Typography>
                         </Box>
                         <IconButton
                             aria-label="close"

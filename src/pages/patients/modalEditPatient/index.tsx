@@ -12,6 +12,7 @@ import {
     Paper,
     TextField,
     Typography,
+    type AlertProps,
 } from "@mui/material";
 
 import { HowToReg } from "@mui/icons-material";
@@ -33,6 +34,8 @@ interface ModalEditProps {
     rows: Patient[] | [];
     setRows: React.Dispatch<SetStateAction<Patient[]>>;
     selectedRow: Patient | null
+    setSnackbar: (value: AlertProps | null) => void;
+
 }
 
 
@@ -43,6 +46,7 @@ const ModalEditPatient: React.FC<ModalEditProps> = (params) => {
         rows,
         setRows,
         selectedRow,
+        setSnackbar
     } = params;
 
     const [id, setId] = useState<string>("")
@@ -163,13 +167,17 @@ const ModalEditPatient: React.FC<ModalEditProps> = (params) => {
                         item.id === response.data.id ? response.data : item
                     )
                 ); handleClose();
-                //notify(null, "Dados salvos com sucesso!", "success");
+                setSnackbar({
+                    children: "Paciente editado com sucesso!",
+                    severity: "success"
+                });
             }
         } catch (error: unknown) {
             console.log(error);
-            // if (error instanceof AxiosError && error?.response?.data && error.status)
-            //     notify(error?.status || 500, undefined, "error", error);
-            // else notify(null, "Erro ao criar novo usuário!", "error");
+            setSnackbar({
+                children: "Erro ao editar paciente",
+                severity: "error"
+            });
         } finally {
             setLoading(false);
         }
