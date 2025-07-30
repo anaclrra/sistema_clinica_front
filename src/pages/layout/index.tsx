@@ -3,7 +3,7 @@ import { useState, type JSX } from "react";
 import SideBar from "../../components/sideBar";
 import { Outlet } from "react-router-dom";
 import TopBar from "../../components/topBar";
-import { Description, MedicalInformation, MedicalServices, NoteAlt, Person } from "@mui/icons-material";
+import { Description, MedicalInformation, Person } from "@mui/icons-material";
 
 export interface LayoutProps {
     colorMode: boolean;
