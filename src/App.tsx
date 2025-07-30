@@ -8,6 +8,7 @@ import Patients from './pages/patients';
 import Doctors from './pages/doctors';
 import PatientHistory from './pages/patients/Appointmentshistory';
 import DoctorHistory from './pages/doctors/AppointmentsHistory';
+import Appointments from './pages/appointments';
 
 function App() {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -71,6 +72,7 @@ function App() {
               <Route index element={<Navigate to="/patients" replace />} />
               <Route path="patients" element={<Patients />} />
               <Route path='doctors' element={<Doctors />} />
+              <Route path='appointments' element={<Appointments />} />
               <Route path='appointments/patient/:id' element={<PatientHistory />} />
               <Route path='appointments/doctor/:id' element={<DoctorHistory />} />
 

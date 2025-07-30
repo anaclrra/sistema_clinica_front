@@ -3,7 +3,7 @@ import { useState, type JSX } from "react";
 import SideBar from "../../components/sideBar";
 import { Outlet } from "react-router-dom";
 import TopBar from "../../components/topBar";
-import { Person } from "@mui/icons-material";
+import { Description, MedicalInformation, MedicalServices, NoteAlt, Person } from "@mui/icons-material";
 
 export interface LayoutProps {
     colorMode: boolean;
@@ -59,13 +59,13 @@ function Layout(params: LayoutProps): JSX.Element {
             label: "Médico",
             hideTitle: true,
             link: "/doctors",
-            icon: <Person />,
+            icon: <MedicalInformation />,
         }, {
             itemId: "3",
             label: "Consulta",
             hideTitle: true,
-            link: "/appointment",
-            icon: <Person />,
+            link: "/appointments",
+            icon: <Description />,
         },]
 
     return (

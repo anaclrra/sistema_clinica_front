@@ -1,31 +1,26 @@
-import { Add, Edit, History, Search } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme, type AlertProps } from "@mui/material";
+import { Add, Edit, Search } from "@mui/icons-material";
+import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, Typography, useTheme, type AlertProps } from "@mui/material";
 import { useEffect, useMemo, useState, type JSX } from "react";
-import useStyles from "./styles";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
-import { maskCPF, maskPhone } from "../../utils/maskFields";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
 import api from "../../services/api";
 import { ptBR } from "@mui/x-data-grid/locales";
-import ModalCreatePatient from "./modalCreatePatient";
-import ModalEditPatient from "./modalEditPatient";
-import { useNavigate } from "react-router-dom";
-import SnackBar from "../../components/snackBar";
 
-function Patients(): JSX.Element {
-    const [rows, setRows] = useState<Patient[]>([]);
+import SnackBar from "../../components/snackBar";
+import useStyles from "./styles";
+
+function Appointments(): JSX.Element {
+    const [rows, setRows] = useState<Appointment[]>([]);
     const [loadingPage, setLoadingPage] = useState(false);
-    const [openCreatePatientModal, setOpenCreatePatientModal] = useState<boolean>(false);
-    const [openEditPatientModal, setOpenEditPatientModal] = useState<boolean>(false)
-    const [selectedRow, setSelectedRow] = useState<Patient | null>(null)
+
+    const [selectedRow, setSelectedRow] = useState<Appointment | null>(null)
     const [snackbar, setSnackbar] = useState<AlertProps | null>(null);
     const [searchText, setSearchText] = useState<string | null>(null)
 
     const theme = useTheme();
     const styles = useStyles(theme);
-    const navigate = useNavigate();
-    console.log(loadingPage)
+    console.log(loadingPage, selectedRow)
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -33,13 +28,14 @@ function Patients(): JSX.Element {
 
 
     const getFilteredRows = useMemo(() => {
-        return rows.filter((row: Patient) => {
+        return rows.filter((row: Appointment) => {
             return (
                 (searchText
-                    ? row?.name
+                    ? row?.status
                         ?.toLowerCase()
                         .includes(searchText.toLowerCase()) ||
-                    row?.cpf.includes(searchText)
+                    row?.doctor?.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                    row?.patient?.name.toLowerCase().includes(searchText.toLowerCase())
                     : true)
             );
         });
@@ -48,64 +44,76 @@ function Patients(): JSX.Element {
     ]);
 
     useEffect(() => {
-        async function fetchPatients() {
+        async function fetchAppointments() {
             try {
                 setLoadingPage(true);
-                const response = await api.get("/patients");
+                const response = await api.get("/appointments");
                 setRows(response.data);
                 setSnackbar({
-                    children: "Sucesso ao buscar pacientes",
+                    children: "Sucesso ao buscar consultas",
                     severity: "success"
                 });
             } catch (error) {
                 console.error(error);
                 setSnackbar({
-                    children: "Error: Não foi possível buscar pacientes",
+                    children: "Error: Não foi possível buscar consultas",
                     severity: "error"
                 });
             } finally {
                 setLoadingPage(false);
             }
         }
-        fetchPatients();
+        fetchAppointments();
     }, []);
-    const columns: GridColDef<Patient>[] = [
+    const columns: GridColDef<Appointment>[] = [
+
+        {
+            minWidth: 100,
+            flex: 1,
+            field: "dateTime",
+            headerName: "Data da consulta",
+            display: "flex",
+            renderCell: (params: GridRenderCellParams) => {
+                return <Stack>{dayjs(params.value).locale("pt-br")
+                    .format("DD/MM/YYYY") || "-"}</Stack>;
+            },
+        },
         {
             minWidth: 200,
             flex: 1,
             field: "name",
-            headerName: "Nome",
+            headerName: "Médico",
             display: "flex",
+            renderCell: (params) => (
+                <Stack sx={styles.containerColumnEmailNome}>
+                    <Typography fontSize={14}>
+                        {params.row?.doctor?.name ? params.row?.doctor?.name : "-"}
+                    </Typography>
+                </Stack>
+            ),
         },
         {
-            minWidth: 150,
+            minWidth: 200,
             flex: 1,
-            field: "cpf",
-            headerName: "CPF",
+            field: "name",
+            headerName: "Paciente",
             display: "flex",
-            renderCell: (params: GridRenderCellParams) => {
-                return <Stack>{maskCPF(params?.value) ?? "-"}</Stack>;
-            },
+            renderCell: (params) => (
+                <Stack sx={styles.containerColumnEmailNome}>
+                    <Typography fontSize={14}>
+                        {params.row?.patient?.name ? params.row?.patient?.name : "-"}
+                    </Typography>
+                </Stack>
+            ),
         },
         {
             minWidth: 100,
             flex: 1,
-            field: "dateOfBirth",
-            headerName: "Data de nascimento",
+            field: "status",
+            headerName: "Status",
             display: "flex",
             renderCell: (params: GridRenderCellParams) => {
-                return <Stack>{dayjs(params.value).locale("pt-br")
-                    .format("D [de] MMM, YYYY") || "-"}</Stack>;
-            },
-        },
-        {
-            minWidth: 100,
-            flex: 1,
-            field: "phone",
-            headerName: "Telefone",
-            display: "flex",
-            renderCell: (params: GridRenderCellParams) => {
-                return <Stack>{maskPhone(params?.value) ?? "-"}</Stack>;
+                return <Stack>{params?.value ?? "-"}</Stack>;
             },
         },
         {
@@ -119,7 +127,7 @@ function Patients(): JSX.Element {
                 return (
                     <Stack sx={styles.stackBtns}>
                         <IconButton onClick={() => handleEditOpen(params.row)}><Edit fontSize="small" /></IconButton>
-                        <IconButton onClick={() => navigate(`/appointments/patient/${params.row.id}`)} ><History fontSize="small" /></IconButton>
+
 
                     </Stack>
                 );
@@ -127,11 +135,11 @@ function Patients(): JSX.Element {
         },
     ];
     const handleNewOpen = () => {
-        setOpenCreatePatientModal(true);
+        //setOpenCreatePatientModal(true);
     };
-    const handleEditOpen = (row: Patient) => {
+    const handleEditOpen = (row: Appointment) => {
         setSelectedRow(row);
-        setOpenEditPatientModal(true)
+        //setOpenEditPatientModal(true)
     }
 
     return (
@@ -142,7 +150,7 @@ function Patients(): JSX.Element {
                         <Box sx={styles.boxSearchAndFilter}>
                             <TextField
                                 size="small"
-                                label="Pesquisar Paciente"
+                                label="Pesquisar Consulta"
                                 variant="filled"
                                 sx={styles.searchInput}
                                 value={searchText}
@@ -160,7 +168,7 @@ function Patients(): JSX.Element {
                             />
 
 
-                            <Tooltip title="Adicionar paciente">
+                            <Tooltip title="Adicionar consulta">
                                 <Button
                                     onClick={handleNewOpen}
                                     sx={styles.buttonMobile}
@@ -191,18 +199,10 @@ function Patients(): JSX.Element {
                     </Box>
                 </Paper>
             </Box>
-            <ModalCreatePatient
-                openCreatePatientModal={openCreatePatientModal}
-                setOpenCreatePatientModal={setOpenCreatePatientModal}
-                rows={rows}
-                setRows={setRows}
-                setSnackbar={setSnackbar}
-            />
-            <ModalEditPatient openEditPatientModal={openEditPatientModal} setOpenEditPatientModal={setOpenEditPatientModal} selectedRow={selectedRow} rows={rows}
-                setRows={setRows} setSnackbar={setSnackbar} />
+
             <SnackBar snackbar={snackbar} setSnackbar={setSnackbar} />
         </>
     )
 }
 
-export default Patients
+export default Appointments

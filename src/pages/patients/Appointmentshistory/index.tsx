@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../services/api";
 import { alpha, Box, Breadcrumbs, Chip, CircularProgress, Grid, Stack, Typography, useTheme, type AlertProps } from "@mui/material";
 import dayjs from "dayjs";
 import { MedicalInformation, Person, Phone } from "@mui/icons-material";
 import SnackBar from "../../../components/snackBar";
-import emptyBox from "../../../assets/empty box.svg"
+import EmptyBox from '../../../assets/emptyBox.svg?react'
+
 interface History extends Appointment {
     doctor: Doctor;
     patient: Patient
@@ -76,6 +77,11 @@ const PatientHistory: React.FC = () => {
             gap: 1,
             color: theme.palette.text.secondary,
         },
+        stack: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+        }
 
     };
     return (loadingPage ? (
@@ -148,7 +154,7 @@ const PatientHistory: React.FC = () => {
                         </Grid>
                     ))}
                 </Grid>
-            ) : (<Stack ><img src={emptyBox} style={{ width: 100, height: 100, fill: theme.palette.text.disabled }} /><Typography>Sem historico de consultas</Typography></Stack>)}
+            ) : (<Stack sx={styles.stack} ><EmptyBox style={{ height: 140, width: 140, fill: theme.palette.text.disabled }} /><Typography sx={{ color: theme.palette.text.disabled }}>Sem historico de consultas</Typography></Stack>)}
             <SnackBar snackbar={snackbar} setSnackbar={setSnackbar} />
         </>
     )

@@ -13,6 +13,7 @@ import {
     Paper,
     TextField,
     Typography,
+    useTheme,
     type AlertProps,
 } from "@mui/material";
 
@@ -72,7 +73,6 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
             flexDirection: "row",
             justifyContent: "start",
             alignItems: "center",
-            color: "primary.main",
             width: "100%",
         },
         subtitle: {
@@ -120,7 +120,7 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
             mb: 1,
         },
     };
-
+    const theme = useTheme()
     useEffect(() => {
         async function handleFetchSpecialties() {
             try {
@@ -199,13 +199,13 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
             sx={styles.modal}
         >
             <Paper sx={styles.paper}>
-                <DialogTitle sx={styles.dialogTitle} color="primary.main">
+                <DialogTitle sx={styles.dialogTitle} >
                     <Box sx={styles.boxHeader}>
                         <Box sx={styles.boxTitle}>
                             <IconButton size="small">
-                                <HowToReg sx={{ color: "primary.main" }} />
+                                <HowToReg sx={{ color: "text.secondary" }} />
                             </IconButton>
-                            <Typography fontWeight={500}>Cadastrar médico</Typography>
+                            <Typography sx={{ color: 'text.primary' }} fontWeight={500}>Cadastrar médico</Typography>
                         </Box>
                         <IconButton
                             aria-label="close"
@@ -290,7 +290,7 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
                 </DialogContent>
                 <DialogActions sx={styles.dialogActions}>
                     <Button
-                        sx={{ color: "primary.main" }}
+                        sx={{ color: "text.primary " }}
                         onClick={handleClose}
                         variant="text"
                         disabled={loading}
@@ -299,8 +299,8 @@ const ModalCreateDoctor: React.FC<ModalCreateProps> = (params) => {
                     </Button>
                     <LoadingButton
                         onClick={handleNewDoctor}
-                        variant="contained"
                         loading={loading}
+                        sx={{ backgroundColor: theme.palette.text.primary, color: theme.palette.text.inverted }}
                     >
                         Salvar
                     </LoadingButton>

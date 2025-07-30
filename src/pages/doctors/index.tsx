@@ -1,6 +1,6 @@
 import { Add, Edit, History, Search } from "@mui/icons-material";
 import { Box, Button, IconButton, InputAdornment, Paper, Stack, TextField, Tooltip, useTheme, type AlertProps } from "@mui/material";
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import useStyles from "./styles";
 import { DataGrid, type GridColDef, type GridRenderCellParams } from "@mui/x-data-grid";
 // import { maskCPF, maskPhone } from "../../utils/maskFields";
@@ -21,72 +21,32 @@ function Doctors(): JSX.Element {
     const [openEditDoctorModal, setOpenEditDoctorModal] = useState<boolean>(false)
     const [selectedRow, setSelectedRow] = useState<Doctor | null>(null)
     const [snackbar, setSnackbar] = useState<AlertProps | null>(null);
+    const [searchText, setSearchText] = useState<string | null>(null)
 
     const theme = useTheme();
     const styles = useStyles(theme);
     const navigate = useNavigate()
     console.log(loadingPage);
 
-    //     const handleSearchInputChange = (event) => {
-    //     setSearchText(event.target.value);
-    //   };
+    const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
 
-    //   const getFilteredRows = useMemo(() => {
-    //     const rowsFiltered = Array.isArray(rows)
-    //       ? rows?.filter(
-    //           (row) =>
-    //             (tabValue === 0 && row.status === true) ||
-    //             (tabValue === 1 && row.status === false)
-    //         )
-    //       : [];
 
-    //     return rowsFiltered?.filter((row) => {
-    //       return (
-    //         (searchText
-    //           ? row?.PerfilCliente?.nomeFantasia
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.PerfilCliente?.nome
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.PerfilCliente?.sobrenome
-    //               ?.toLowerCase()
-    //               .includes(searchText.toLowerCase()) ||
-    //             row?.login?.toLowerCase().includes(searchText.toLowerCase()) ||
-    //             row?.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-    //             (removeMask(row?.PerfilCliente?.cpf).includes(
-    //               removeMask(searchText)
-    //             ) &&
-    //               !!removeMask(searchText)) ||
-    //             (removeMask(row?.PerfilCliente?.cnpj).includes(
-    //               removeMask(searchText)
-    //             ) &&
-    //               !!removeMask(searchText))
-    //           : true) &&
-    //         row.verificado?.toString().includes(verifyStatus?.value?.toString()) &&
-    //         row.codigoPermissao?.includes(permissionStatus?.value) &&
-    //         (criadoEm
-    //           ? new Date(row?.createAt)
-    //               .toLocaleDateString()
-    //               .includes(new Date(criadoEm).toLocaleDateString())
-    //           : true) &&
-    //         (row?.PerfilCliente
-    //           ? row?.PerfilCliente?.pessoaFisica
-    //               ?.toString()
-    //               .includes(personTypeStatus?.value?.toString())
-    //           : true)
-    //       );
-    //     });
-    //   }, [
-    //     verifyStatus,
-    //     permissionStatus,
-    //     personTypeStatus,
-    //     criadoEm,
-    //     tabValue,
-    //     rows,
-    //     searchText,
-    //   ]);
-
+    const getFilteredRows = useMemo(() => {
+        return rows.filter((row: Doctor) => {
+            return (
+                (searchText
+                    ? row?.name
+                        ?.toLowerCase()
+                        .includes(searchText.toLowerCase()) ||
+                    row?.crm.includes(searchText)
+                    : true)
+            );
+        });
+    }, [
+        rows, searchText
+    ]);
     useEffect(() => {
         async function fetchPatients() {
             try {
@@ -173,8 +133,8 @@ function Doctors(): JSX.Element {
                                 label="Pesquisar Médico"
                                 variant="filled"
                                 sx={styles.searchInput}
-                                // value={searchText}
-                                // onChange={handleSearchInputChange}
+                                value={searchText}
+                                onChange={handleSearchInputChange}
                                 autoComplete="off"
                                 slotProps={{
                                     input: {
@@ -201,7 +161,7 @@ function Doctors(): JSX.Element {
                     </Box>
 
                     <Box width="100%">
-                        <DataGrid rows={rows} columns={columns} density="standard"
+                        <DataGrid rows={getFilteredRows} columns={columns} density="standard"
                             disableColumnMenu
                             disableColumnFilter
                             hideFooterSelectedRowCount

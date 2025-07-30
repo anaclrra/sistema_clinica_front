@@ -5,6 +5,9 @@ declare module "@mui/material/styles" {
     textField: string;
     card: string;
   }
+  interface TypeText {
+    inverted: string;
+  }
   interface PaperPropsVariantOverrides {
     default: true;
   }
@@ -46,6 +49,7 @@ const mainTheme = (colorMode: boolean): Theme =>
         primary: colorMode ? "#FFFFFF" : "#1C252E",
         secondary: colorMode ? "#919EAB" : "#637381",
         disabled: colorMode ? "#637381" : "#919EAB",
+        inverted: !colorMode ? "#FFFFFF" : "#1C252E",
       },
       success: {
         main: colorMode ? "#22C55E" : "#04B55D",
@@ -71,27 +75,39 @@ const mainTheme = (colorMode: boolean): Theme =>
     },
     components: {
       MuiButton: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            textTransform: "capitalize",
+            boxShadow: "none",
+            borderRadius: 5,
+            color: theme.palette.primary.main,
+            "&:hover": {
+              boxShadow: "none",
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            },
+          }),
+        },
         variants: [
           {
             props: { variant: "contained" },
-            style: {
-              backgroundColor: !colorMode
-                ? alpha(colors.primary.light, 0.1)
-                : alpha(colors.primary.dark, 0.1),
-              color: !colorMode ? colors.primary.light : colors.primary.dark,
-            },
+            style: ({ theme }) => ({
+              backgroundColor: alpha(theme.palette.primary.light, 0.1),
+              color: theme.palette.primary.light,
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.dark, 0.2),
+              },
+            }),
+          },
+          {
+            props: { variant: "text" },
+            style: ({ theme }) => ({
+              color: theme.palette.text.primary,
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.background.textField, 0.1),
+              },
+            }),
           },
         ],
-        styleOverrides: {
-          root: {
-            textTransform: "capitalize",
-            boxShadow: "none",
-            borderRadius: "5px",
-            "&:hover": {
-              boxShadow: "none",
-            },
-          },
-        },
       },
       MuiTextField: {
         styleOverrides: {

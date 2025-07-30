@@ -12,6 +12,7 @@ import {
     Paper,
     TextField,
     Typography,
+    useTheme,
     type AlertProps,
 } from "@mui/material";
 
@@ -126,7 +127,7 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
             mb: 1,
         },
     };
-
+    const theme = useTheme()
 
 
     async function handleNewPatient() {
@@ -194,13 +195,13 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
             sx={styles.modal}
         >
             <Paper sx={styles.paper}>
-                <DialogTitle sx={styles.dialogTitle} color="primary.main">
+                <DialogTitle sx={styles.dialogTitle} >
                     <Box sx={styles.boxHeader}>
                         <Box sx={styles.boxTitle}>
                             <IconButton size="small">
-                                <HowToReg sx={{ color: "primary.main" }} />
+                                <HowToReg sx={{ color: "text.secondary" }} />
                             </IconButton>
-                            <Typography fontWeight={500}>Cadastrar Paciente</Typography>
+                            <Typography sx={{ color: 'text.primary' }} fontWeight={500}>Cadastrar Paciente</Typography>
                         </Box>
                         <IconButton
                             aria-label="close"
@@ -325,7 +326,6 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
                 </DialogContent>
                 <DialogActions sx={styles.dialogActions}>
                     <Button
-                        sx={{ color: "primary.main" }}
                         onClick={handleClose}
                         variant="text"
                         disabled={loading}
@@ -334,8 +334,8 @@ const ModalCreatePatient: React.FC<ModalCreateProps> = (params) => {
                     </Button>
                     <LoadingButton
                         onClick={handleNewPatient}
-                        variant="contained"
                         loading={loading}
+                        sx={{ backgroundColor: theme.palette.text.primary, color: theme.palette.text.inverted }}
                     >
                         Salvar
                     </LoadingButton>

@@ -23,6 +23,8 @@ declare global {
     status: Status;
     patientId: string;
     doctorId: string;
+    doctor?: Doctor;
+    patient?: Patient;
   }
   interface Doctor {
     id: string;

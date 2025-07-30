@@ -13,6 +13,7 @@ import {
     Paper,
     TextField,
     Typography,
+    useTheme,
     type AlertProps,
 } from "@mui/material";
 
@@ -75,7 +76,6 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
             flexDirection: "row",
             justifyContent: "start",
             alignItems: "center",
-            color: "primary.main",
             width: "100%",
         },
         subtitle: {
@@ -123,6 +123,8 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
             mb: 1,
         },
     };
+    const theme = useTheme()
+
     useEffect(() => {
         if (selectedRow) {
             console.log(selectedRow);
@@ -216,13 +218,13 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
             sx={styles.modal}
         >
             <Paper sx={styles.paper}>
-                <DialogTitle sx={styles.dialogTitle} color="primary.main">
+                <DialogTitle sx={styles.dialogTitle}>
                     <Box sx={styles.boxHeader}>
                         <Box sx={styles.boxTitle}>
                             <IconButton size="small">
-                                <HowToReg sx={{ color: "primary.main" }} />
+                                <HowToReg sx={{ color: "text.secondary" }} />
                             </IconButton>
-                            <Typography fontWeight={500}>Editar medico {name}</Typography>
+                            <Typography sx={{ color: 'text.primary' }} fontWeight={500}>Editar medico {name}</Typography>
                         </Box>
                         <IconButton
                             aria-label="close"
@@ -307,7 +309,6 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
                 </DialogContent>
                 <DialogActions sx={styles.dialogActions}>
                     <Button
-                        sx={{ color: "primary.main" }}
                         onClick={handleClose}
                         variant="text"
                         disabled={loading}
@@ -316,8 +317,8 @@ const ModalEditDoctor: React.FC<ModalCreateProps> = (params) => {
                     </Button>
                     <LoadingButton
                         onClick={handleEditDoctor}
-                        variant="contained"
                         loading={loading}
+                        sx={{ backgroundColor: theme.palette.text.primary, color: theme.palette.text.inverted }}
                     >
                         Salvar
                     </LoadingButton>
