@@ -25,7 +25,6 @@ function Patients(): JSX.Element {
     const theme = useTheme();
     const styles = useStyles(theme);
     const navigate = useNavigate();
-    console.log(loadingPage)
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -183,6 +182,7 @@ function Patients(): JSX.Element {
                             getRowClassName={(params) =>
                                 params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row'
                             }
+                            loading={loadingPage}
                             initialState={{
                                 pagination: {
                                     paginationModel: { pageSize: 5 },

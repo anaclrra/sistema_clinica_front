@@ -26,7 +26,6 @@ function Doctors(): JSX.Element {
     const theme = useTheme();
     const styles = useStyles(theme);
     const navigate = useNavigate()
-    console.log(loadingPage);
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -165,6 +164,7 @@ function Doctors(): JSX.Element {
                             disableColumnMenu
                             disableColumnFilter
                             hideFooterSelectedRowCount
+                            loading={loadingPage}
                             localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
                             sx={styles.dataGrid}
                             getRowClassName={(params) =>

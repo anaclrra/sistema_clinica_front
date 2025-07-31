@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../services/api";
-import { alpha, Box, Breadcrumbs, Chip, CircularProgress, Grid, Stack, Typography, useTheme } from "@mui/material";
+import { Avatar, Box, Breadcrumbs, CircularProgress, Divider, Grid, Icon, Stack, Typography, useTheme } from "@mui/material";
 import dayjs from "dayjs";
-import { MedicalInformation, Person, Phone } from "@mui/icons-material";
 import EmptyBox from '../../../assets/emptyBox.svg?react'
+import { maskPhone } from "../../../utils/maskFields";
+import { Cancel, CheckCircle, Schedule } from "@mui/icons-material";
 
 interface History extends Appointment {
     doctor: Doctor;
@@ -16,6 +17,7 @@ interface History extends Appointment {
 const DoctorHistory: React.FC = () => {
     const [history, setHistory] = useState<History[]>([]);
     const [loadingPage, setLoadingPage] = useState(false);
+    const [name, setName] = useState<string | null>(null)
 
     const navigate = useNavigate()
     const theme = useTheme()
@@ -28,8 +30,8 @@ const DoctorHistory: React.FC = () => {
             try {
                 setLoadingPage(true);
                 const response = await api.get(`/appointments/doctor/${id}`);
-
-                setHistory(response.data); console.log(response.data);
+                setHistory(response.data);
+                setName(response.data[0].doctor.name ?? 'Sem nome')
 
             } catch (error) {
                 console.error(error);
@@ -45,7 +47,7 @@ const DoctorHistory: React.FC = () => {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "AGENDADA":
-                return theme.palette.info.main as 'info';
+                return theme.palette.primary.main as 'primary';
             case "CANCELADA":
                 return theme.palette.error.main as 'error'
             case "CONCLUIDA":
@@ -54,9 +56,25 @@ const DoctorHistory: React.FC = () => {
                 return theme.palette.primary.main as 'default'
         }
     }
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case "AGENDADA":
+                return <Schedule color="primary" />;
+            case "CANCELADA":
+                return <Cancel color="error" />;
+            case "CONCLUIDA":
+                return <CheckCircle color="success" />;
+            default:
+                return null;
+        }
+    };
+
     const styles = {
+        container: { display: 'flex', flexDirection: 'column', gap: 3 },
+        stackProgress: {
+            display: 'flex', height: '100%', minHeight: '50vh', justifyContent: 'center', alignItems: 'center'
+        },
         containerBox: {
-            //border: `1px solid ${theme.palette.divider}`,
             borderRadius: '0.5rem',
             color: theme.palette.text.primary,
             padding: 2,
@@ -65,16 +83,16 @@ const DoctorHistory: React.FC = () => {
         },
         boxHeader: {
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 2,
+            flexDirection: 'column', gap: 1,
+            justifyContent: 'space-between',
+            marginTop: 1
         },
         boxContent: {
             display: "flex",
-            flexDirection: "column",
-            gap: 1,
             color: theme.palette.text.secondary,
-        }, stack: {
+            marginBottom: 1
+        },
+        stack: {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -82,9 +100,11 @@ const DoctorHistory: React.FC = () => {
 
     };
     return (loadingPage ? (
-        <CircularProgress />
+        <Stack sx={styles.stackProgress}>
+            <CircularProgress />
+        </Stack>
     ) : (
-        <>
+        <Box sx={styles.container}>
             <Stack>
                 <Breadcrumbs aria-label="breadcrumb">
                     <Box
@@ -99,7 +119,7 @@ const DoctorHistory: React.FC = () => {
                     >
                         Médicos
                     </Box>
-                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Historico médico</Typography>
+                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Historico médico {name}</Typography>
                 </Breadcrumbs>
 
             </Stack>
@@ -108,48 +128,56 @@ const DoctorHistory: React.FC = () => {
                     {history.map((h) => (
                         <Grid size={{ xs: 12, md: 4 }} key={h.id}>
                             <Box sx={styles.containerBox}>
-                                <Box sx={styles.boxHeader}>
-                                    <Typography variant="subtitle1" fontWeight={600}>
-                                        {dayjs(h.dateTime).format("DD/MM/YYYY [às] HH:mm")}
-                                    </Typography>
-                                    <Chip
-                                        label={h.status}
-                                        sx={{
-                                            backgroundColor: alpha(getStatusColor(h.status), 0.2),
-                                            color: getStatusColor(h.status),
-
-                                        }}
-                                    />
-                                </Box>
 
                                 <Box sx={styles.boxContent}>
                                     <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <MedicalInformation sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.doctor.name} -{h.doctor.crm}
+                                        <Avatar alt={h.patient.name.toUpperCase()} src="unknow" />
+                                        <Stack>
+                                            <Typography color={theme.palette.text.primary}>
+                                                {h.patient.name}
+                                            </Typography>
+                                            <Typography color={theme.palette.text.secondary}>
+                                                {maskPhone(h.patient.phone)}
+                                            </Typography></Stack>
+                                    </Stack>
+                                </Box>
+                                <Divider />
+                                <Box sx={styles.boxHeader}>
+                                    <Stack>
+                                        <Typography variant="subtitle1" sx={{ color: theme.palette.text.secondary }}>
+                                            Horário
+                                        </Typography>
+                                        <Typography variant="subtitle1" fontWeight={600}>
+                                            {dayjs(h.dateTime).format("DD/MM/YYYY [às] HH:mm")}
                                         </Typography>
                                     </Stack>
-                                    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <Person sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.patient.name} - {h.patient.cpf}
+                                    <Stack >
+                                        <Typography variant="subtitle1" sx={{ color: theme.palette.text.secondary }}>
+                                            Status
                                         </Typography>
-                                    </Stack>
-                                    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <Phone sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.patient.phone}
-                                        </Typography>
-                                    </Stack>
+                                        <Stack direction="row" spacing={1} alignItems="center" justifyContent='start'>
+                                            <Icon>{getStatusIcon(h.status)}</Icon>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{
+                                                    color: getStatusColor(h.status),
+                                                }}
+                                                textTransform={'capitalize'}
+                                            >
+                                                {h.status.toLowerCase()}
+                                            </Typography>
+                                        </Stack>
 
+                                    </Stack>
 
                                 </Box>
+
                             </Box>
                         </Grid>
                     ))}
                 </Grid>
             ) : (<Stack sx={styles.stack} ><EmptyBox style={{ height: 140, width: 140, fill: theme.palette.text.disabled }} /><Typography sx={{ color: theme.palette.text.disabled }}>Sem historico de consultas</Typography></Stack>)}
-        </>
+        </Box>
     )
 
     )

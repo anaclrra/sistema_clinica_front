@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../../services/api";
-import { alpha, Box, Breadcrumbs, Chip, CircularProgress, Grid, Stack, Typography, useTheme, type AlertProps } from "@mui/material";
+import { Avatar, Box, Breadcrumbs, CircularProgress, Divider, Grid, Icon, Stack, Typography, useTheme, type AlertProps } from "@mui/material";
 import dayjs from "dayjs";
-import { MedicalInformation, Person, Phone } from "@mui/icons-material";
 import SnackBar from "../../../components/snackBar";
 import EmptyBox from '../../../assets/emptyBox.svg?react'
+import { Cancel, CheckCircle, Schedule } from "@mui/icons-material";
 
 interface History extends Appointment {
     doctor: Doctor;
@@ -17,6 +17,7 @@ interface History extends Appointment {
 const PatientHistory: React.FC = () => {
     const [history, setHistory] = useState<History[]>([]);
     const [loadingPage, setLoadingPage] = useState(false);
+    const [name, setName] = useState<string | null>(null)
     const [snackbar, setSnackbar] = useState<AlertProps | null>(null);
 
     const navigate = useNavigate()
@@ -31,6 +32,7 @@ const PatientHistory: React.FC = () => {
                 setLoadingPage(true);
                 const response = await api.get(`/appointments/patient/${id}`);
                 setHistory(response.data);
+                setName(response.data[0].patient.name ?? 'Sem nome')
 
             } catch (error) {
                 console.error(error);
@@ -47,7 +49,7 @@ const PatientHistory: React.FC = () => {
     const getStatusColor = (status: string) => {
         switch (status) {
             case "AGENDADA":
-                return theme.palette.info.main as 'info';
+                return theme.palette.primary.main as 'primary';
             case "CANCELADA":
                 return theme.palette.error.main as 'error'
             case "CONCLUIDA":
@@ -56,9 +58,25 @@ const PatientHistory: React.FC = () => {
                 return theme.palette.primary.main as 'default'
         }
     }
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case "AGENDADA":
+                return <Schedule color="primary" />;
+            case "CANCELADA":
+                return <Cancel color="error" />;
+            case "CONCLUIDA":
+                return <CheckCircle color="success" />;
+            default:
+                return null;
+        }
+    };
+
     const styles = {
+        container: { display: 'flex', flexDirection: 'column', gap: 3 },
+        stackProgress: {
+            display: 'flex', height: '100%', minHeight: '50vh', justifyContent: 'center', alignItems: 'center'
+        },
         containerBox: {
-            //border: `1px solid ${theme.palette.divider}`,
             borderRadius: '0.5rem',
             color: theme.palette.text.primary,
             padding: 2,
@@ -67,15 +85,13 @@ const PatientHistory: React.FC = () => {
         },
         boxHeader: {
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 2,
+            flexDirection: 'column', gap: 0.5,
+            marginTop: 1
         },
         boxContent: {
             display: "flex",
-            flexDirection: "column",
-            gap: 1,
             color: theme.palette.text.secondary,
+            marginBottom: 1
         },
         stack: {
             display: "flex",
@@ -85,11 +101,11 @@ const PatientHistory: React.FC = () => {
 
     };
     return (loadingPage ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+        <Stack sx={styles.stackProgress}>
             <CircularProgress />
-        </Box>
+        </Stack>
     ) : (
-        <>
+        <Box sx={styles.container}>
             <Stack>
                 <Breadcrumbs aria-label="breadcrumb">
                     <Box
@@ -104,59 +120,65 @@ const PatientHistory: React.FC = () => {
                     >
                         Pacientes
                     </Box>
-                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Historico paciente</Typography>
+                    <Typography sx={{ fontSize: '1.125rem', color: 'text.primary' }}>Histórico paciente {name}</Typography>
                 </Breadcrumbs>
 
             </Stack>
             {history && history.length > 0 ? (
-
                 <Grid container spacing={2}>
                     {history.map((h) => (
                         <Grid size={{ xs: 12, md: 4 }} key={h.id}>
                             <Box sx={styles.containerBox}>
-                                <Box sx={styles.boxHeader}>
-                                    <Typography variant="subtitle1" fontWeight={600}>
-                                        {dayjs(h.dateTime).format("DD/MM/YYYY [às] HH:mm")}
-                                    </Typography>
-                                    <Chip
-                                        label={h.status}
-                                        sx={{
-                                            backgroundColor: alpha(getStatusColor(h.status), 0.2),
-                                            color: getStatusColor(h.status),
-
-                                        }}
-                                    />
-                                </Box>
 
                                 <Box sx={styles.boxContent}>
                                     <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <MedicalInformation sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.doctor.name} -{h.doctor.crm}
-                                        </Typography>
+                                        <Avatar alt={h.patient.name.toUpperCase()} src="unknow" />
+                                        <Stack>
+                                            <Typography color={theme.palette.text.primary}>
+                                                {h.doctor.name}
+                                            </Typography>
+                                            <Typography color={theme.palette.text.secondary}>
+                                                {h.doctor.crm}
+                                            </Typography></Stack>
                                     </Stack>
-                                    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <Person sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.patient.name} - {h.patient.cpf}
-                                        </Typography>
-                                    </Stack>
-                                    <Stack sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center', justifyContent: 'start' }}>
-                                        <Phone sx={{ color: theme.palette.text.disabled }} />
-                                        <Typography color={theme.palette.text.primary}>
-                                            {h.patient.phone}
-                                        </Typography>
-                                    </Stack>
-
-
                                 </Box>
+                                <Divider />
+                                <Box sx={styles.boxHeader}>
+                                    <Stack>
+                                        <Typography variant="subtitle1" sx={{ color: theme.palette.text.secondary }}>
+                                            Horário
+                                        </Typography>
+                                        <Typography variant="subtitle1" fontWeight={600}>
+                                            {dayjs(h.dateTime).format("DD/MM/YYYY [às] HH:mm")}
+                                        </Typography>
+                                    </Stack>
+                                    <Stack>
+                                        <Typography variant="subtitle1" sx={{ color: theme.palette.text.secondary }}>
+                                            Status
+                                        </Typography>
+                                        <Stack direction="row" spacing={1} alignItems="center" justifyContent='start'>
+                                            <Icon>{getStatusIcon(h.status)}</Icon>
+                                            <Typography
+                                                variant="subtitle1"
+                                                sx={{
+                                                    color: getStatusColor(h.status),
+                                                }}
+                                                textTransform={'capitalize'}
+                                            >
+                                                {h.status.toLowerCase()}
+                                            </Typography>
+                                        </Stack>
+
+                                    </Stack>
+                                </Box>
+
                             </Box>
                         </Grid>
                     ))}
                 </Grid>
             ) : (<Stack sx={styles.stack} ><EmptyBox style={{ height: 140, width: 140, fill: theme.palette.text.disabled }} /><Typography sx={{ color: theme.palette.text.disabled }}>Sem historico de consultas</Typography></Stack>)}
             <SnackBar snackbar={snackbar} setSnackbar={setSnackbar} />
-        </>
+        </Box>
     )
 
     )

@@ -20,7 +20,7 @@ function Appointments(): JSX.Element {
 
     const theme = useTheme();
     const styles = useStyles(theme);
-    console.log(loadingPage, selectedRow)
+    console.log(selectedRow)
 
     const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -34,7 +34,7 @@ function Appointments(): JSX.Element {
                     ? row?.status
                         ?.toLowerCase()
                         .includes(searchText.toLowerCase()) ||
-                    row?.doctor?.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                    row?.patient?.name.toLowerCase().includes(searchText.toLowerCase()) ||
                     row?.patient?.name.toLowerCase().includes(searchText.toLowerCase())
                     : true)
             );
@@ -87,7 +87,7 @@ function Appointments(): JSX.Element {
             renderCell: (params) => (
                 <Stack sx={styles.containerColumnEmailNome}>
                     <Typography fontSize={14}>
-                        {params.row?.doctor?.name ? params.row?.doctor?.name : "-"}
+                        {params.row?.patient?.name ? params.row?.patient?.name : "-"}
                     </Typography>
                 </Stack>
             ),
@@ -191,6 +191,7 @@ function Appointments(): JSX.Element {
                             getRowClassName={(params) =>
                                 params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row'
                             }
+                            loading={loadingPage}
                             initialState={{
                                 pagination: {
                                     paginationModel: { pageSize: 5 },

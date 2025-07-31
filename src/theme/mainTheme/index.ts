@@ -14,19 +14,20 @@ declare module "@mui/material/styles" {
 }
 const colors = {
   primary: {
-    light: "#00B1D9",
-    dark: "#00B1D9",
-  },
-  secondary: {
     light: "#FF8732",
     dark: "#FF8732",
+  },
+  secondary: {
+    light: "#00B1D9",
+    dark: "#00B1D9",
   },
 };
 
 const mainTheme = (colorMode: boolean): Theme =>
   createTheme({
     typography: {
-      fontFamily: `'Lato'`,
+      fontFamily: `'Roboto'`,
+      fontSize: 12,
     },
     shape: {
       borderRadius: 8,
