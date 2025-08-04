@@ -69,7 +69,7 @@ function App() {
                 <Layout colorMode={colorMode} setColorMode={setColorMode} />
               }
             >
-              <Route index element={<Navigate to="/patients" replace />} />
+              <Route index element={<Navigate to="/appointments" replace />} />
               <Route path="patients" element={<Patients />} />
               <Route path='doctors' element={<Doctors />} />
               <Route path='appointments' element={<Appointments />} />
