@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import EmptyBox from '../../../assets/emptyBox.svg?react'
 import { maskPhone } from "../../../utils/maskFields";
 import { Cancel, CheckCircle, Schedule } from "@mui/icons-material";
+import { getStatusColor } from "../../../utils/statusStyles";
 
 interface History extends Appointment {
     doctor: Doctor;
@@ -44,18 +45,7 @@ const DoctorHistory: React.FC = () => {
         }
         fetchDoctorHistory();
     }, [id]);
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "AGENDADA":
-                return theme.palette.primary.main as 'primary';
-            case "CANCELADA":
-                return theme.palette.error.main as 'error'
-            case "CONCLUIDA":
-                return theme.palette.success.main as 'success'
-            default:
-                return theme.palette.primary.main as 'default'
-        }
-    }
+
     const getStatusIcon = (status: string) => {
         switch (status) {
             case "AGENDADA":
@@ -160,7 +150,7 @@ const DoctorHistory: React.FC = () => {
                                             <Typography
                                                 variant="subtitle1"
                                                 sx={{
-                                                    color: getStatusColor(h.status),
+                                                    color: getStatusColor(h.status, theme),
                                                 }}
                                                 textTransform={'capitalize'}
                                             >
