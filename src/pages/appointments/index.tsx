@@ -27,7 +27,6 @@ function Appointments(): JSX.Element {
         setSearchText(event.target.value);
     };
 
-
     const getFilteredRows = useMemo(() => {
         return rows.filter((row: Appointment) => {
             return (
@@ -138,8 +137,8 @@ function Appointments(): JSX.Element {
 
                 return (
                     <Stack sx={styles.stackBtns}>
-                        <IconButton onClick={() => handleEditOpen(params.row)}><Edit fontSize="small" /></IconButton>
-                        <IconButton onClick={() => handleCancelAppointment(params.row.id)}><Cancel fontSize="small" /></IconButton>
+                        <IconButton onClick={() => handleEditOpen(params.row)} disabled={params.row.status === 'CANCELADA'}><Edit fontSize="small" /></IconButton>
+                        <IconButton onClick={() => handleCancelAppointment(params.row.id)} disabled={params.row.status === 'CANCELADA'}><Cancel fontSize="small" /></IconButton>
 
 
                     </Stack>
